@@ -4,16 +4,19 @@ import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.*
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import com.example.automaticdoorsapk.AdminActivity
 import com.example.automaticdoorsapk.UserActivity
 import com.example.automaticdoorsapk.ServerActivity
@@ -23,6 +26,8 @@ fun LoginScreen() {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -57,7 +62,7 @@ fun LoginScreen() {
             trailingIcon = {
                 IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                     Icon(
-                        imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                        imageVector = if (isPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
                         contentDescription = "Mostrar senha"
                     )
                 }
@@ -70,11 +75,20 @@ fun LoginScreen() {
             onClick = {
                 val userType = validateUser(username, password)
                 when (userType) {
-                    "admin" -> navigateToAdminActivity()
-                    "user" -> navigateToUserActivity()
-                    "server" -> navigateToServerActivity()
+                    "admin" -> {
+                        val intent = Intent(context, AdminActivity::class.java)
+                        context.startActivity(intent)
+                    }
+                    "user" -> {
+                        val intent = Intent(context, UserActivity::class.java)
+                        context.startActivity(intent)
+                    }
+                    "server" -> {
+                        val intent = Intent(context, ServerActivity::class.java)
+                        context.startActivity(intent)
+                    }
                     else -> {
-                        // Mensagem de erro
+                        // Mensagem de erro ou feedback para o usuário
                     }
                 }
             },
@@ -85,6 +99,7 @@ fun LoginScreen() {
     }
 }
 
+// Função de validação de usuário
 fun validateUser(username: String, password: String): String {
     // Simula a validação do tipo de usuário com base nas credenciais
     return when (username) {
@@ -93,25 +108,4 @@ fun validateUser(username: String, password: String): String {
         "server" -> "server"
         else -> ""
     }
-}
-
-fun navigateToAdminActivity() {
-    // Navega para a Activity do Admin
-    val context = LocalContext.current
-    val intent = Intent(context, AdminActivity::class.java)
-    context.startActivity(intent)
-}
-
-fun navigateToUserActivity() {
-    // Navega para a Activity do Usuário
-    val context = LocalContext.current
-    val intent = Intent(context, UserActivity::class.java)
-    context.startActivity(intent)
-}
-
-fun navigateToServerActivity() {
-    // Navega para a Activity do Servidor
-    val context = LocalContext.current
-    val intent = Intent(context, ServerActivity::class.java)
-    context.startActivity(intent)
 }
