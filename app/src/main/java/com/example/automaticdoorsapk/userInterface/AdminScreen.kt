@@ -8,10 +8,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.automaticdoorsapk.openOpenCloseDoorsActivity
 
 @Composable
 fun AdminScreen() {
+
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -21,7 +26,7 @@ fun AdminScreen() {
     ) {
         Text("Admin Dashboard", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(bottom = 24.dp))
 
-        Button(onClick = { /* Abrir/Fechar Portas */ }) {
+        Button(onClick = { openOpenCloseDoorsActivity(context) }) {
             Text("Abrir/Fechar Portas")
         }
 
@@ -44,3 +49,4 @@ fun AdminScreen() {
         }
     }
 }
+
