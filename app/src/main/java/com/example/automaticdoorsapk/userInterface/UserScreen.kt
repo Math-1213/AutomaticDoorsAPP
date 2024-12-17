@@ -1,6 +1,5 @@
 package com.example.automaticdoorsapk.userInterface
 
-import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -10,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
-import com.example.automaticdoorsapk.openOpenCloseDoorsActivity
+import com.example.automaticdoorsapk.userInterface.function.openOpenCloseDoorsActivity
 
 @Composable
 fun UserScreen() {

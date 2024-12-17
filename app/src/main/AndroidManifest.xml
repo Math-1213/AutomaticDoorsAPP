@@ -31,23 +31,30 @@
             android:name=".UserActivity"
             android:exported="true" />
 
-        <!-- AdminActivity (caso exista) -->
+        <!-- AdminActivity -->
         <activity
             android:name=".AdminActivity"
             android:exported="true" />
 
-        <!-- ServerActivity (caso exista) -->
+        <!-- ServerActivity -->
         <activity
             android:name=".ServerActivity"
             android:exported="true" />
 
         <!-- Doors Control Activity -->
-        <activity android:name=".OpenCloseDoorsActivity"
+        <activity android:name=".userInterface.function.OpenCloseDoorsActivity"
             android:label="Controle de Portas"
             android:exported="true">
         </activity>
 
+        <!-- Tag Registry Activity -->
+        <activity android:name=".userInterface.function.RegisterTagActivity"
+            android:label="Cadastar Tag">
+        </activity>
 
+        <activity android:name=".userInterface.function.LogActivity"
+            android:label="Log Entry">
+        </activity>
     </application>
 
 </manifest>
