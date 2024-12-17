@@ -1,20 +1,24 @@
 package com.example.automaticdoorsapk.userInterface.function
 
+import LogViewModel
+import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
-import com.example.automaticdoorsapk.userInterface.function.ui.theme.AutomaticDoorsAPKTheme
+import com.example.automaticdoorsapk.ui.theme.AutomaticDoorsAPKTheme
+import com.example.automaticdoorsapk.userInterface.function.data.room.LogEntry
+
 
 class LogActivity : ComponentActivity() {
 
@@ -22,7 +26,7 @@ class LogActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        logViewModel = ViewModelProvider(this).get(LogViewModel::class.java)
+        logViewModel = ViewModelProvider(this)[LogViewModel::class.java]
 
         setContent {
             AutomaticDoorsAPKTheme {

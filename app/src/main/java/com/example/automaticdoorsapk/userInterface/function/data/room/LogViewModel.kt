@@ -2,6 +2,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
+import com.example.automaticdoorsapk.userInterface.function.data.room.AppDatabase
+import com.example.automaticdoorsapk.userInterface.function.data.room.LogEntry
 import kotlinx.coroutines.launch
 
 class LogViewModel(application: Application) : AndroidViewModel(application) {
