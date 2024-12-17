@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.automaticdoorsapk.userInterface.function.navigateToLogActivity
 import com.example.automaticdoorsapk.userInterface.function.navigateToRegisterTag
 import com.example.automaticdoorsapk.userInterface.function.openOpenCloseDoorsActivity
 
@@ -45,7 +46,7 @@ fun AdminScreen() {
         Spacer(modifier = Modifier.height(16.dp))
 
         // Button for "Visualizar Log"
-        Button(onClick = { /* Visualizar Log */ }) {
+        Button(onClick = { navigateToLogActivity(context) }) {
             Text("Visualizar Log")
         }
     }

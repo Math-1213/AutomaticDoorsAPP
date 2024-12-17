@@ -2,6 +2,8 @@ package com.example.automaticdoorsapk.userInterface.function
 
 import LogViewModel
 import android.app.Application
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -78,8 +80,7 @@ fun LogEntryItem(entry: LogEntry) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewLogScreen() {
-    LogScreen(viewModel = LogViewModel(Application())) // Preview requires context, so you can pass mock data for preview
+fun navigateToLogActivity(context: Context) {
+    val intent = Intent(context, LogActivity::class.java)
+    context.startActivity(intent)
 }
