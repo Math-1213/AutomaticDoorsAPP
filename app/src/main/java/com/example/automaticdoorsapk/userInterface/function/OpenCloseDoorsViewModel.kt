@@ -66,3 +66,12 @@ class OpenCloseDoorsViewModel(private val mqttManager: MqttManager) : ViewModel(
         }
     }
 }
+
+class OpenCloseDoorsViewModelFactory(private val mqttManager: MqttManager) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(OpenCloseDoorsViewModel::class.java)) {
+            return OpenCloseDoorsViewModel(mqttManager) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
