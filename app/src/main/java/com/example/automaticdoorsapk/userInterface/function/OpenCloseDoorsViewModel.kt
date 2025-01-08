@@ -23,25 +23,24 @@ class OpenCloseDoorsViewModel(private val mqttManager: MqttManager) : ViewModel(
         _userName.value = name
     }
 
-    // Funções para abrir e fechar portas via MQTT
-    fun openInternalDoor() {
+    // Funções para abrir/fechar a porta interna
+    private fun openInternalDoor() {
         mqttManager.publish("home/doors/openIN", "")
         _isInternalDoorOpen.value = true
-        _isExternalDoorOpen.value = false // Garante que a outra porta seja fechada
     }
 
-    fun closeInternalDoor() {
+    private fun closeInternalDoor() {
         mqttManager.publish("home/doors/closeIN", "")
         _isInternalDoorOpen.value = false
     }
 
-    fun openExternalDoor() {
+    // Funções para abrir/fechar a porta externa
+    private fun openExternalDoor() {
         mqttManager.publish("home/doors/openOUT", "")
         _isExternalDoorOpen.value = true
-        _isInternalDoorOpen.value = false // Garante que a outra porta seja fechada
     }
 
-    fun closeExternalDoor() {
+    private fun closeExternalDoor() {
         mqttManager.publish("home/doors/closeOUT", "")
         _isExternalDoorOpen.value = false
     }
@@ -51,6 +50,8 @@ class OpenCloseDoorsViewModel(private val mqttManager: MqttManager) : ViewModel(
         if (_isInternalDoorOpen.value == true) {
             closeInternalDoor()
         } else {
+            // Caso a porta interna seja aberta, fechar a externa
+            if (_isExternalDoorOpen.value == true) closeExternalDoor()
             openInternalDoor()
         }
     }
@@ -59,6 +60,8 @@ class OpenCloseDoorsViewModel(private val mqttManager: MqttManager) : ViewModel(
         if (_isExternalDoorOpen.value == true) {
             closeExternalDoor()
         } else {
+            // Caso a porta externa seja aberta, fechar a interna
+            if (_isInternalDoorOpen.value == true) closeInternalDoor()
             openExternalDoor()
         }
     }
