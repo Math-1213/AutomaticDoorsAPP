@@ -13,53 +13,35 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
+import android.content.Context
+import androidx.activity.viewModels
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.automaticdoorsapk.network.MqttManager
 
 class OpenCloseDoorsActivity : ComponentActivity() {
+
+    private val mqttManager = MqttManager() // Certifique-se de inicializar corretamente
+    private val viewModel: OpenCloseDoorsViewModel by viewModels { 
+        OpenCloseDoorsViewModelFactory(mqttManager) 
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            OpenCloseDoorsScreen()
+            OpenCloseDoorsScreen(viewModel)
         }
     }
 }
-
 @Composable
-fun OpenCloseDoorsScreen() {
-    // State for the user's name
+fun OpenCloseDoorsScreen(viewModel: OpenCloseDoorsViewModel = viewModel()) {
+    // Observa os estados do ViewModel
+    val userName by viewModel.userName.observeAsState("")
+    val isInternalDoorOpen by viewModel.isInternalDoorOpen.observeAsState(false)
+    val isExternalDoorOpen by viewModel.isExternalDoorOpen.observeAsState(false)
+
     var tempName by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") }
-    var isNameValid by remember { mutableStateOf(false) } // To track if name is valid
+    var isNameValid by remember { mutableStateOf(false) }
 
-    // States for controlling the doors
-    val isInternalDoorOpen = remember { mutableStateOf(false) }
-    val isExternalDoorOpen = remember { mutableStateOf(false) }
-
-    // Functions to toggle door states
-    fun toggleInternalDoor() {
-        if (isInternalDoorOpen.value) {
-            isInternalDoorOpen.value = false
-        } else {
-            // Close external door if it's open
-            if (isExternalDoorOpen.value) {
-                isExternalDoorOpen.value = false
-            }
-            isInternalDoorOpen.value = true
-        }
-    }
-
-    fun toggleExternalDoor() {
-        if (isExternalDoorOpen.value) {
-            isExternalDoorOpen.value = false
-        } else {
-            // Close internal door if it's open
-            if (isInternalDoorOpen.value) {
-                isInternalDoorOpen.value = false
-            }
-            isExternalDoorOpen.value = true
-        }
-    }
-
-    // Layout for the screen
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -67,88 +49,76 @@ fun OpenCloseDoorsScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Name input section
-        if (name.isEmpty()) {
+        if (userName.isEmpty()) {
+            // Se o nome do usuário ainda não foi definido
             Text(
                 text = "Digite seu nome:",
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // Input field for the person's name
             OutlinedTextField(
                 value = tempName,
                 onValueChange = {
                     tempName = it
-                    isNameValid = tempName.isNotEmpty() // Validate name
+                    isNameValid = tempName.isNotEmpty()
                 },
                 label = { Text("Nome") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
 
-            // Button to confirm the name
             Button(
-                onClick = {
-                    name = tempName;
-                },
+                onClick = { viewModel.setUserName(tempName) },
                 modifier = Modifier.padding(top = 16.dp),
-                enabled = isNameValid // Button only enabled if name is valid
+                enabled = isNameValid
             ) {
                 Text("Confirmar Nome")
             }
         } else {
-            // If the name is entered, show the door controls
+            // Controles para abrir/fechar portas
             Button(
-                onClick = {
-                    isNameValid = false;
-                    name = "";
-                }
-            ){
-                Text(text = "Mudar Nome")
+                onClick = { viewModel.setUserName("") },
+                modifier = Modifier.padding(bottom = 16.dp)
+            ) {
+                Text("Mudar Nome")
             }
 
             Text(
-                text = "Bem-vindo, $name!",
+                text = "Bem-vindo, $userName!",
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            // Toggle Internal Door Button
+            // Controle da Porta Interna
             Button(
-                onClick = { toggleInternalDoor() },
+                onClick = { viewModel.toggleInternalDoor() },
                 modifier = Modifier.padding(bottom = 16.dp)
             ) {
-                Text(text = if (isInternalDoorOpen.value) "Fechar Porta Interna" else "Abrir Porta Interna")
+                Text(text = if (isInternalDoorOpen) "Fechar Porta Interna" else "Abrir Porta Interna")
             }
 
             Text(
-                text = "Porta Interna: ${if (isInternalDoorOpen.value) "Aberta" else "Fechada"}",
+                text = "Porta Interna: ${if (isInternalDoorOpen) "Aberta" else "Fechada"}",
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            // Toggle External Door Button
+            // Controle da Porta Externa
             Button(
-                onClick = { toggleExternalDoor() },
+                onClick = { viewModel.toggleExternalDoor() },
                 modifier = Modifier.padding(bottom = 16.dp)
             ) {
-                Text(text = if (isExternalDoorOpen.value) "Fechar Porta Externa" else "Abrir Porta Externa")
+                Text(text = if (isExternalDoorOpen) "Fechar Porta Externa" else "Abrir Porta Externa")
             }
 
             Text(
-                text = "Porta Externa: ${if (isExternalDoorOpen.value) "Aberta" else "Fechada"}"
+                text = "Porta Externa: ${if (isExternalDoorOpen) "Aberta" else "Fechada"}"
             )
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    OpenCloseDoorsScreen()
-}
-
-fun openOpenCloseDoorsActivity(context: android.content.Context) {
+fun openOpenCloseDoorsActivity(context: Context) {
     val intent = Intent(context, OpenCloseDoorsActivity::class.java)
     context.startActivity(intent)
 }
