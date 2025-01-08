@@ -32,9 +32,9 @@ class OpenCloseDoorsActivity : ComponentActivity() {
         }
     }
 }
+
 @Composable
 fun OpenCloseDoorsScreen(viewModel: OpenCloseDoorsViewModel = viewModel()) {
-    // Observa os estados do ViewModel
     val userName by viewModel.userName.observeAsState("")
     val isInternalDoorOpen by viewModel.isInternalDoorOpen.observeAsState(false)
     val isExternalDoorOpen by viewModel.isExternalDoorOpen.observeAsState(false)
@@ -50,7 +50,6 @@ fun OpenCloseDoorsScreen(viewModel: OpenCloseDoorsViewModel = viewModel()) {
         verticalArrangement = Arrangement.Center
     ) {
         if (userName.isEmpty()) {
-            // Se o nome do usuário ainda não foi definido
             Text(
                 text = "Digite seu nome:",
                 style = MaterialTheme.typography.headlineMedium,
@@ -76,7 +75,6 @@ fun OpenCloseDoorsScreen(viewModel: OpenCloseDoorsViewModel = viewModel()) {
                 Text("Confirmar Nome")
             }
         } else {
-            // Controles para abrir/fechar portas
             Button(
                 onClick = { viewModel.setUserName("") },
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -90,7 +88,6 @@ fun OpenCloseDoorsScreen(viewModel: OpenCloseDoorsViewModel = viewModel()) {
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            // Controle da Porta Interna
             Button(
                 onClick = { viewModel.toggleInternalDoor() },
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -103,7 +100,6 @@ fun OpenCloseDoorsScreen(viewModel: OpenCloseDoorsViewModel = viewModel()) {
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            // Controle da Porta Externa
             Button(
                 onClick = { viewModel.toggleExternalDoor() },
                 modifier = Modifier.padding(bottom = 16.dp)
