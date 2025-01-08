@@ -1,3 +1,5 @@
+package com.example.automaticdoorsapk.userInterface.function
+
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
