@@ -11,6 +11,6 @@ interface LogEntryDao {
     @Insert
     suspend fun insertLog(logEntry: LogEntry)
 
-    @Query("SELECT * FROM log_entries ORDER BY id DESC")
+    @Query("SELECT * FROM log_entries ORDER BY date DESC")
     fun getAllLogs(): LiveData<List<LogEntry>>
 }

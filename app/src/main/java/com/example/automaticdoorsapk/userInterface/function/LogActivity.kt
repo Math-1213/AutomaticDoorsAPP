@@ -1,7 +1,5 @@
 package com.example.automaticdoorsapk.userInterface.function
 
-import LogViewModel
-import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -15,11 +13,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import com.example.automaticdoorsapk.ui.theme.AutomaticDoorsAPKTheme
 import com.example.automaticdoorsapk.userInterface.function.data.room.LogEntry
+import com.example.automaticdoorsapk.userInterface.function.data.room.LogViewModel
 
 
 class LogActivity : ComponentActivity() {

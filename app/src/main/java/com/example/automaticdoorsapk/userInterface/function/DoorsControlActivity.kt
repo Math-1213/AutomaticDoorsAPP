@@ -10,65 +10,39 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.tooling.preview.Preview
-import com.google.android.gms.location.LocationServices
-import com.example.automaticdoorsapk.userInterface.function.LocationHelper
+import android.content.Context
+import androidx.activity.viewModels
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.viewmodel.*
+import com.example.automaticdoorsapk.network.MqttManager
 
 class OpenCloseDoorsActivity : ComponentActivity() {
 
-    private lateinit var locationHelper: LocationHelper
+    private val mqttManager = MqttManager(
+        context = TODO(),
+        brokerUrl = TODO(),
+        clientId = TODO()
+    ) // Certifique-se de inicializar corretamente
+    private val viewModel: OpenCloseDoorsViewModel by viewModels {
+        OpenCloseDoorsViewModelFactory(mqttManager)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Inicialize o LocationHelper
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        locationHelper = LocationHelper(this, fusedLocationClient)
-
         setContent {
-            OpenCloseDoorsScreen(
-                onInternalDoorToggled = { locationHelper.fetchLocation() },
-                onExternalDoorToggled = { locationHelper.fetchLocation() }
-            )
+            OpenCloseDoorsScreen(viewModel)
         }
     }
 }
 
 @Composable
-fun OpenCloseDoorsScreen(
-    onInternalDoorToggled: () -> Unit,
-    onExternalDoorToggled: () -> Unit
-) {
+fun OpenCloseDoorsScreen(viewModel: OpenCloseDoorsViewModel) {
+    val userName by viewModel.userName.observeAsState("")
+    val isInternalDoorOpen by viewModel.isInternalDoorOpen.observeAsState(false)
+    val isExternalDoorOpen by viewModel.isExternalDoorOpen.observeAsState(false)
+
     var tempName by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") }
     var isNameValid by remember { mutableStateOf(false) }
-
-    val isInternalDoorOpen = remember { mutableStateOf(false) }
-    val isExternalDoorOpen = remember { mutableStateOf(false) }
-
-    fun toggleInternalDoor() {
-        if (isInternalDoorOpen.value) {
-            isInternalDoorOpen.value = false
-        } else {
-            if (isExternalDoorOpen.value) {
-                isExternalDoorOpen.value = false
-            }
-            isInternalDoorOpen.value = true
-        }
-        onInternalDoorToggled() // Chama o registro da localização
-    }
-
-    fun toggleExternalDoor() {
-        if (isExternalDoorOpen.value) {
-            isExternalDoorOpen.value = false
-        } else {
-            if (isInternalDoorOpen.value) {
-                isInternalDoorOpen.value = false
-            }
-            isExternalDoorOpen.value = true
-        }
-        onExternalDoorToggled() // Chama o registro da localização
-    }
 
     Column(
         modifier = Modifier
@@ -77,7 +51,7 @@ fun OpenCloseDoorsScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        if (name.isEmpty()) {
+        if (userName.isEmpty()) {
             Text(
                 text = "Digite seu nome:",
                 style = MaterialTheme.typography.headlineMedium,
@@ -96,7 +70,7 @@ fun OpenCloseDoorsScreen(
             )
 
             Button(
-                onClick = { name = tempName },
+                onClick = { viewModel.setUserName(tempName) },
                 modifier = Modifier.padding(top = 16.dp),
                 enabled = isNameValid
             ) {
@@ -104,56 +78,45 @@ fun OpenCloseDoorsScreen(
             }
         } else {
             Button(
-                onClick = {
-                    isNameValid = false
-                    name = ""
-                }
+                onClick = { viewModel.setUserName("") },
+                modifier = Modifier.padding(bottom = 16.dp)
             ) {
-                Text(text = "Mudar Nome")
+                Text("Mudar Nome")
             }
 
             Text(
-                text = "Bem-vindo, $name!",
+                text = "Bem-vindo, $userName!",
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
             Button(
-                onClick = { toggleInternalDoor() },
+                onClick = { viewModel.toggleInternalDoor() },
                 modifier = Modifier.padding(bottom = 16.dp)
             ) {
-                Text(text = if (isInternalDoorOpen.value) "Fechar Porta Interna" else "Abrir Porta Interna")
+                Text(text = if (isInternalDoorOpen) "Fechar Porta Interna" else "Abrir Porta Interna")
             }
 
             Text(
-                text = "Porta Interna: ${if (isInternalDoorOpen.value) "Aberta" else "Fechada"}",
+                text = "Porta Interna: ${if (isInternalDoorOpen) "Aberta" else "Fechada"}",
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
             Button(
-                onClick = { toggleExternalDoor() },
+                onClick = { viewModel.toggleExternalDoor() },
                 modifier = Modifier.padding(bottom = 16.dp)
             ) {
-                Text(text = if (isExternalDoorOpen.value) "Fechar Porta Externa" else "Abrir Porta Externa")
+                Text(text = if (isExternalDoorOpen) "Fechar Porta Externa" else "Abrir Porta Externa")
             }
 
             Text(
-                text = "Porta Externa: ${if (isExternalDoorOpen.value) "Aberta" else "Fechada"}"
+                text = "Porta Externa: ${if (isExternalDoorOpen) "Aberta" else "Fechada"}"
             )
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    OpenCloseDoorsScreen(
-        onInternalDoorToggled = {},
-        onExternalDoorToggled = {}
-    )
-}
-
-fun openOpenCloseDoorsActivity(context: android.content.Context) {
+fun openOpenCloseDoorsActivity(context: Context) {
     val intent = Intent(context, OpenCloseDoorsActivity::class.java)
     context.startActivity(intent)
 }
