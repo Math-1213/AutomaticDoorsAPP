@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import android.content.Context
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.viewmodel.*
@@ -18,11 +19,7 @@ import com.example.automaticdoorsapk.network.MqttManager
 
 class OpenCloseDoorsActivity : ComponentActivity() {
 
-    private val mqttManager = MqttManager(
-        context = TODO(),
-        brokerUrl = TODO(),
-        clientId = TODO()
-    ) // Certifique-se de inicializar corretamente
+    private lateinit var mqttManager: MqttManager
     private val viewModel: OpenCloseDoorsViewModel by viewModels {
         OpenCloseDoorsViewModelFactory(mqttManager)
     }
@@ -31,6 +28,30 @@ class OpenCloseDoorsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             OpenCloseDoorsScreen(viewModel)
+        }
+        // Inicialize o MqttManager
+        mqttManager = MqttManager(
+            context = this,
+            brokerUrl = "tcp://broker.hivemq.com:1883",
+            clientId = "androidClient"
+        )
+
+        // Conectar ao broker MQTT
+        mqttManager.connect(
+            onConnected = {
+                Log.d("OpenCloseDoorsActivity", "Conexão ao MQTT estabelecida.")
+            },
+            onError = { throwable ->
+                Log.e("OpenCloseDoorsActivity", "Erro ao conectar ao MQTT: ${throwable.message}")
+            }
+        )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Feche a conexão MQTT quando a atividade for destruída
+        if (mqttManager.isConnected()) {
+            mqttManager.disconnect() // Adicione uma função disconnect no seu MqttManager se necessário
         }
     }
 }

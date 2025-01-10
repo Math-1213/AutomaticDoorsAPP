@@ -24,26 +24,34 @@ class OpenCloseDoorsViewModel(private val mqttManager: MqttManager) : ViewModel(
         _userName.value = name
     }
 
+    private fun publishDoorState(topic: String, msg: String) {
+        if (mqttManager.isConnected()) {
+            mqttManager.publish(topic, msg)
+        } else {
+            println("MQTT Não Inicializado")
+        }
+    }
+
     // Funções para abrir/fechar a porta interna
     private fun openInternalDoor() {
-        mqttManager.publish("home/doors/openIN", "")
-        _isInternalDoorOpen.value = true
+        publishDoorState("home/doors/openIN", "1")
+        _isInternalDoorOpen.value = true // Correto
     }
 
     private fun closeInternalDoor() {
-        mqttManager.publish("home/doors/closeIN", "")
-        _isInternalDoorOpen.value = false
+        publishDoorState("home/doors/closeIN", "1")
+        _isInternalDoorOpen.value = false // Corrigido para 'false'
     }
 
     // Funções para abrir/fechar a porta externa
     private fun openExternalDoor() {
-        mqttManager.publish("home/doors/openOUT", "")
-        _isExternalDoorOpen.value = true
+        publishDoorState("home/doors/openOUT", "1")
+        _isExternalDoorOpen.value = true // Correto
     }
 
     private fun closeExternalDoor() {
-        mqttManager.publish("home/doors/closeOUT", "")
-        _isExternalDoorOpen.value = false
+        publishDoorState("home/doors/closeOUT", "1")
+        _isExternalDoorOpen.value = false // Corrigido para 'false'
     }
 
     // Funções para alternar o estado das portas

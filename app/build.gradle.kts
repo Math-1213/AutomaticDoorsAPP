@@ -51,7 +51,7 @@ android {
 }
 
 dependencies {
-    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation(libs.play.services.location.v2101)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -69,6 +69,7 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.org.eclipse.paho.client.mqttv3)
     implementation(libs.org.eclipse.paho.android.service)
+    implementation(libs.androidx.localbroadcastmanager)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
