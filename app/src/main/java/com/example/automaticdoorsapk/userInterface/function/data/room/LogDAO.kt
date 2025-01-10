@@ -14,3 +14,5 @@ interface LogEntryDao {
     @Query("SELECT * FROM log_entries ORDER BY date DESC")
     fun getAllLogs(): LiveData<List<LogEntry>>
 }
+
+//TODO

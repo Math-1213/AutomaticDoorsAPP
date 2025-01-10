@@ -3,6 +3,7 @@ package com.example.automaticdoorsapk.userInterface.function
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,11 +22,7 @@ import com.example.automaticdoorsapk.network.MqttManager
 
 class RegisterTagActivity : ComponentActivity() {
 
-    private val mqttManager = MqttManager(
-        context = TODO(),
-        brokerUrl = TODO(),
-        clientId = TODO()
-    ) // Certifique-se de inicializar corretamente
+    private lateinit var mqttManager: MqttManager
     private val viewModel: RegisterTagViewModel by viewModels {
         RegisterTagViewModelFactory(mqttManager)
     }
@@ -34,6 +31,30 @@ class RegisterTagActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             RegisterTagScreen(viewModel)
+        }
+
+        mqttManager = MqttManager(
+            context = this,
+            brokerUrl = "tcp://broker.hivemq.com:1883",
+            clientId = "androidClient"
+        )
+
+        // Conectar ao broker MQTT
+        mqttManager.connect(
+            onConnected = {
+                Log.d("OpenCloseDoorsActivity", "Conexão ao MQTT estabelecida.")
+            },
+            onError = { throwable ->
+                Log.e("OpenCloseDoorsActivity", "Erro ao conectar ao MQTT: ${throwable.message}")
+            }
+        )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Feche a conexão MQTT quando a atividade for destruída
+        if (mqttManager.isConnected()) {
+            mqttManager.disconnect() // Adicione uma função disconnect no seu MqttManager se necessário
         }
     }
 }
@@ -113,5 +134,6 @@ fun RegisterTagScreen(viewModel: RegisterTagViewModel) {
 }
 
 fun navigateToRegisterTag(context: Context) {
-
+    val intent = Intent(context, LogActivity::class.java)
+    context.startActivity(intent)
 }

@@ -19,3 +19,5 @@ class LogViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 }
+
+//TODO
