@@ -3,11 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.automaticdoorsapk">
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /><!-- localização precisa -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /><!-- localização aproximada por meio de redes -->
+    <uses-permission android:name="android.permission.INTERNET"/><!-- acesso a internet -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" /><!-- evita descanço de tela  -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /><!-- verificar se esta conectado -->
 
 
 
