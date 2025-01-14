@@ -1,5 +1,6 @@
 package com.example.automaticdoorsapk.userInterface.function
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -7,8 +8,14 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.automaticdoorsapk.network.MqttManager
 import com.example.automaticdoorsapk.userInterface.function.data.room.LogEntry
 import com.example.automaticdoorsapk.userInterface.function.data.room.LogViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
 
-class OpenCloseDoorsViewModel(private val mqttManager: MqttManager, private val logViewModel: LogViewModel) : ViewModel() {
+
+class OpenCloseDoorsViewModel(
+    private val mqttManager: MqttManager,
+    private val logViewModel: LogViewModel,
+    private val context: Context,
+    private val fusedLocationClient: FusedLocationProviderClient) : ViewModel() {
 
     private val _userName = MutableLiveData<String>()
     val userName: LiveData<String> get() = _userName
@@ -40,13 +47,20 @@ class OpenCloseDoorsViewModel(private val mqttManager: MqttManager, private val 
 
     // Função para registrar um log
     private fun logDoorAction(doorName: String, action: String) {
-        val logEntry = LogEntry(
-            date = System.currentTimeMillis(),
-            loginName = _userName.value ?: "unknown",
-            methodOfLogin = "MQTT",
-            additionalInfo = "Porta $doorName foi $action"
-        )
-        logViewModel.insertLog(logEntry)
+        val locationHelper = LocationHelper(context, fusedLocationClient)
+
+        locationHelper.getLocationAsString { address ->
+            val locationInfo = address ?: "Localização não disponível"
+
+            val logEntry = LogEntry(
+                date = System.currentTimeMillis(),
+                loginName = _userName.value ?: "unknown",
+                methodOfLogin = "MQTT",
+                additionalInfo = "Porta $doorName foi $action na localização: $locationInfo"
+            )
+
+            logViewModel.insertLog(logEntry)
+        }
     }
 
     // Funções para abrir/fechar a porta interna
@@ -97,13 +111,16 @@ class OpenCloseDoorsViewModel(private val mqttManager: MqttManager, private val 
 
 class OpenCloseDoorsViewModelFactory(
     private val mqttManager: MqttManager,
-    private val logViewModel: LogViewModel
+    private val logViewModel: LogViewModel,
+    private val context: Context,
+    private val fusedLocationClient: FusedLocationProviderClient
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(OpenCloseDoorsViewModel::class.java)) {
-            return OpenCloseDoorsViewModel(mqttManager, logViewModel) as T
+            return OpenCloseDoorsViewModel(mqttManager, logViewModel, context, fusedLocationClient) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+

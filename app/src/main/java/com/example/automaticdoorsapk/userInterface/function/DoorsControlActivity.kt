@@ -17,13 +17,18 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.viewmodel.*
 import com.example.automaticdoorsapk.network.MqttManager
 import com.example.automaticdoorsapk.userInterface.function.data.room.LogViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 
 class OpenCloseDoorsActivity : ComponentActivity() {
 
     private lateinit var mqttManager: MqttManager
+    private val fusedLocationClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
+
     private val logViewModel: LogViewModel by viewModels()
     private val viewModel: OpenCloseDoorsViewModel by viewModels {
-        OpenCloseDoorsViewModelFactory(mqttManager, logViewModel)
+        OpenCloseDoorsViewModelFactory(mqttManager, logViewModel,
+            context = this, fusedLocationClient = fusedLocationClient)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

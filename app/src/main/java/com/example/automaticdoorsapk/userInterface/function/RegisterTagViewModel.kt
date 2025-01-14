@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.automaticdoorsapk.network.MqttManager
 import com.example.automaticdoorsapk.userInterface.function.data.Tag
+import com.google.gson.Gson
 
 class RegisterTagViewModel(private val mqttManager: MqttManager) : ViewModel() {
 
@@ -97,9 +98,14 @@ class RegisterTagViewModel(private val mqttManager: MqttManager) : ViewModel() {
                 name = _tagName.value.orEmpty(),
                 description = _tagDescription.value.orEmpty()
             )
-            println("Tag salva: $tag")
-            mqttManager.publish("home/doors/Registro", tag.toString())
+
+            val gson = Gson()
+            val tagJson = gson.toJson(tag) // Converte o objeto para JSON
+
+            println("Tag salva: $tagJson")
+            mqttManager.publish("home/doors/Registro", tagJson)
             toggleMode()
         }
     }
+
 }

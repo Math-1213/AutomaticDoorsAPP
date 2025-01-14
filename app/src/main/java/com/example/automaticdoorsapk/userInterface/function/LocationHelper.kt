@@ -66,4 +66,50 @@ class LocationHelper(
             Log.e("LocationLogApp", "Failed to save log: ${e.message}")
         }
     }
+
+    fun getLocationAsString(onResult: (String?) -> Unit) {
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != android.content.pm.PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.e("LocationLogApp", "Permission not granted!")
+            onResult(null) // Retorna nulo caso não tenha permissão
+            return
+        }
+
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                Thread {
+                    try {
+                        val geocoder = Geocoder(context, Locale.getDefault())
+                        val addresses =
+                            geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                        if (!addresses.isNullOrEmpty()) {
+                            val address = addresses[0].getAddressLine(0)
+                            Log.i("LocationLogApp", "Address fetched: $address")
+                            onResult(address) // Retorna o endereço como String
+                        } else {
+                            Log.e("LocationLogApp", "No address found!")
+                            onResult(null) // Retorna nulo se não encontrar o endereço
+                        }
+                    } catch (e: Exception) {
+                        Log.e("LocationLogApp", "Geocoder error: ${e.message}")
+                        onResult(null) // Retorna nulo em caso de erro
+                    }
+                }.start()
+            } else {
+                Log.e("LocationLogApp", "Location is null!")
+                onResult(null) // Retorna nulo se a localização for nula
+            }
+        }.addOnFailureListener { exception ->
+            Log.e("LocationLogApp", "Error fetching location: ${exception.message}")
+            onResult(null) // Retorna nulo em caso de falha
+        }
+    }
+
 }
