@@ -26,8 +26,9 @@ class LogActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        logViewModel = ViewModelProvider(this)[LogViewModel::class.java]
 
+        logViewModel = ViewModelProvider(this)[LogViewModel::class.java]
+        //logViewModel.insertExampleLogs()
         setContent {
             AutomaticDoorsAPKTheme {
                 LogScreen(logViewModel)

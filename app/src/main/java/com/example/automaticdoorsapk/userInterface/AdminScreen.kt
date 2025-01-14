@@ -43,14 +43,6 @@ fun AdminScreen() {
             Text("Cadastrar Nova Tag")
         }
 
-        //TODO
-        //Spacer(modifier = Modifier.height(16.dp))
-
-        // Button for "Editar Tag"
-        //Button(onClick = { navigateToRegisterTag(context) }) {
-        //    Text("Editar Tag")
-        //}
-
         Spacer(modifier = Modifier.height(16.dp))
 
         // Button for "Visualizar Log"

@@ -16,9 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.automaticdoorsapk.userInterface.function.data.Tag
 import com.example.automaticdoorsapk.network.MqttManager
-
 
 class RegisterTagActivity : ComponentActivity() {
 
@@ -42,31 +40,42 @@ class RegisterTagActivity : ComponentActivity() {
         // Conectar ao broker MQTT
         mqttManager.connect(
             onConnected = {
-                Log.d("OpenCloseDoorsActivity", "Conexão ao MQTT estabelecida.")
+                Log.d("RegisterTagActivity", "Conexão ao MQTT estabelecida.")
+                viewModel.setConnectionStatus(true)
+
+                // Inscrever-se no tópico RFID
+                mqttManager.subscribeToRfidTopic({ message ->
+                    Log.d("RegisterTagActivity", "Mensagem recebida do tópico home/doors/RFID: $message")
+                    val tagId = message
+                    viewModel.setTagId(tagId) // Atualiza apenas o ID da tag
+                }, { throwable ->
+                    Log.e("RegisterTagActivity", "Erro ao inscrever no tópico RFID: ${throwable.message}")
+                })
             },
             onError = { throwable ->
-                Log.e("OpenCloseDoorsActivity", "Erro ao conectar ao MQTT: ${throwable.message}")
+                Log.e("RegisterTagActivity", "Erro ao conectar ao MQTT: ${throwable.message}")
+                viewModel.setConnectionStatus(false)
             }
         )
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        // Feche a conexão MQTT quando a atividade for destruída
+        // Fechar a conexão MQTT quando a atividade for destruída
         if (mqttManager.isConnected()) {
-            mqttManager.disconnect() // Adicione uma função disconnect no seu MqttManager se necessário
+            mqttManager.disconnect()
         }
     }
 }
 
-
 @Composable
 fun RegisterTagScreen(viewModel: RegisterTagViewModel) {
-    val isRegisterMode by viewModel.isRegisterMode.observeAsState(false)
     val tagId by viewModel.tagId.observeAsState("Aguardando Tag...")
     val tagName by viewModel.tagName.observeAsState("")
     val tagDescription by viewModel.tagDescription.observeAsState("")
     val isTagValid by viewModel.isTagValid.observeAsState(false)
+    val isRegisterMode by viewModel.isRegisterMode.observeAsState(false)
+    val isConnected by viewModel.isConnected.observeAsState(false) // Observar o estado de conexão
 
     val context = LocalContext.current
 
@@ -79,11 +88,14 @@ fun RegisterTagScreen(viewModel: RegisterTagViewModel) {
     ) {
         // Botão para alternar entre os modos
         Button(
-            onClick = { viewModel.toggleMode() },
+            onClick = {
+                viewModel.toggleMode()
+            },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (isRegisterMode) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-            )
+            ),
+                    enabled = isConnected
         ) {
             Text(if (isRegisterMode) "Parar Registro" else "Iniciar Registro")
         }
@@ -133,7 +145,8 @@ fun RegisterTagScreen(viewModel: RegisterTagViewModel) {
     }
 }
 
+// Função para navegar até a tela de registro de tag
 fun navigateToRegisterTag(context: Context) {
-    val intent = Intent(context, LogActivity::class.java)
+    val intent = Intent(context, RegisterTagActivity::class.java)
     context.startActivity(intent)
 }

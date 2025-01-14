@@ -16,45 +16,59 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.viewmodel.*
 import com.example.automaticdoorsapk.network.MqttManager
+import com.example.automaticdoorsapk.userInterface.function.data.room.LogViewModel
 
 class OpenCloseDoorsActivity : ComponentActivity() {
 
     private lateinit var mqttManager: MqttManager
+    private val logViewModel: LogViewModel by viewModels()
     private val viewModel: OpenCloseDoorsViewModel by viewModels {
-        OpenCloseDoorsViewModelFactory(mqttManager)
+        OpenCloseDoorsViewModelFactory(mqttManager, logViewModel)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             OpenCloseDoorsScreen(viewModel)
         }
-        // Inicialize o MqttManager
+
         mqttManager = MqttManager(
             context = this,
             brokerUrl = "tcp://broker.hivemq.com:1883",
             clientId = "androidClient"
         )
 
-        // Conectar ao broker MQTT
+        // Aguardar a conexão MQTT
         mqttManager.connect(
             onConnected = {
                 Log.d("OpenCloseDoorsActivity", "Conexão ao MQTT estabelecida.")
+                // Habilitar a tela após a conexão
             },
             onError = { throwable ->
                 Log.e("OpenCloseDoorsActivity", "Erro ao conectar ao MQTT: ${throwable.message}")
+                // Voltar para a MainActivity caso a conexão falhe
+                finish()  // Fechar a Activity atual
             }
         )
+
+        // Observar o status da conexão MQTT
+        mqttManager.connectionStatus.observe(this) { isConnected ->
+            if (!isConnected) {
+                // Conexão perdida, voltar para a Activity anterior
+                finish() // Fecha a atividade atual
+            }
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        // Feche a conexão MQTT quando a atividade for destruída
         if (mqttManager.isConnected()) {
-            mqttManager.disconnect() // Adicione uma função disconnect no seu MqttManager se necessário
+            mqttManager.disconnect() // Desconectar MQTT
         }
     }
 }
+
 
 @Composable
 fun OpenCloseDoorsScreen(viewModel: OpenCloseDoorsViewModel) {

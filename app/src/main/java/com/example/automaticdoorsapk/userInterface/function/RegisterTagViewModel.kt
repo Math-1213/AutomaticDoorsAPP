@@ -6,8 +6,11 @@ import androidx.lifecycle.ViewModel
 import com.example.automaticdoorsapk.network.MqttManager
 import com.example.automaticdoorsapk.userInterface.function.data.Tag
 
-
 class RegisterTagViewModel(private val mqttManager: MqttManager) : ViewModel() {
+
+    // Estado do modo de registro
+    private val _isRegisterMode = MutableLiveData(false)
+    val isRegisterMode: LiveData<Boolean> get() = _isRegisterMode
 
     // Estado do ID da tag detectada
     private val _tagId = MutableLiveData<String>()
@@ -25,58 +28,77 @@ class RegisterTagViewModel(private val mqttManager: MqttManager) : ViewModel() {
     private val _isTagValid = MutableLiveData<Boolean>()
     val isTagValid: LiveData<Boolean> get() = _isTagValid
 
-    // Estado do modo atual (Funcionamento ou Registro)
-    private val _isRegisterMode = MutableLiveData<Boolean>(false)
-    val isRegisterMode: LiveData<Boolean> get() = _isRegisterMode
+    // Estado da Conexão MQTT
+    private val _isConnected = MutableLiveData<Boolean>(false) // Status de conexão MQTT
+    val isConnected: LiveData<Boolean> get() = _isConnected
+
+    fun setConnectionStatus(isConnected: Boolean) {
+        _isConnected.value = isConnected
+    }
 
     init {
         validateTag()
     }
 
+    private fun clearTagData() {
+        _tagId.value = ""
+        _tagName.value = ""
+        _tagDescription.value = ""
+        _isTagValid.value = false
+    }
+
     // Alternar modo entre Registro e Funcionamento
     fun toggleMode() {
         if (_isRegisterMode.value == true) {
-            mqttManager.publish("home/doors/stopRegisterTag", "")
+            // Envia a mensagem MQTT para parar o registro
+            mqttManager.publish("home/doors/stopRegisterTag", "1")
+            clearTagData()
         } else {
-            mqttManager.publish("home/doors/registerTag", "")
+            // Envia a mensagem MQTT para iniciar o registro
+            mqttManager.publish("home/doors/registerTag", "1")
         }
         _isRegisterMode.value = !_isRegisterMode.value!!
+    }
+
+    // Atualizar o modo de registro
+    fun setRegisterMode(isInRegMode: Boolean) {
+        _isRegisterMode.value = isInRegMode
     }
 
     // Atualizar o ID da tag detectada
     fun setTagId(id: String) {
         _tagId.value = id
+        validateTag()  // Validar após definir o ID da tag
     }
 
     // Atualizar o nome do proprietário da tag
     fun setTagName(name: String) {
         _tagName.value = name
-        validateTag()
+        validateTag()  // Validar após alterar o nome
     }
 
     // Atualizar a descrição da tag
     fun setTagDescription(description: String) {
         _tagDescription.value = description
-        validateTag()
+        validateTag()  // Validar após alterar a descrição
     }
 
     // Validar se os campos da tag estão preenchidos
     private fun validateTag() {
-        _isTagValid.value = !(_tagName.value.isNullOrEmpty() || _tagDescription.value.isNullOrEmpty())
+        // A tag é válida se o ID, nome e descrição não estiverem vazios
+        _isTagValid.value = !(_tagId.value.isNullOrEmpty() || _tagName.value.isNullOrEmpty() || _tagDescription.value.isNullOrEmpty())
     }
 
     // Salvar a tag registrada
     fun saveTag() {
-        if (_isRegisterMode.value == true) {
+        if (_isRegisterMode.value == true && _isTagValid.value == true) {
             val tag = Tag(
                 id = _tagId.value.orEmpty(),
                 name = _tagName.value.orEmpty(),
                 description = _tagDescription.value.orEmpty()
             )
-            // Enviar a tag para o repositório ou banco de dados
             println("Tag salva: $tag")
-
-            // Retornar para o modo de funcionamento
+            mqttManager.publish("home/doors/Registro", tag.toString())
             toggleMode()
         }
     }

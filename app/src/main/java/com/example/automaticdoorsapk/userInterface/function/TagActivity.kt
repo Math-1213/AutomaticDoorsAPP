@@ -24,7 +24,6 @@ class TagsActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TagsScreen(viewModel = viewModel) { tag ->
-                val intent = Intent(this, EditTagActivity::class.java)
                 intent.putExtra("tagId", tag.id)
                 intent.putExtra("tagName", tag.name)
                 intent.putExtra("tagDescription", tag.description)
