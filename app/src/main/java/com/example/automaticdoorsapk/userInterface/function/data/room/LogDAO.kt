@@ -13,6 +13,7 @@ interface LogEntryDao {
 
     @Query("SELECT * FROM log_entries ORDER BY date DESC")
     fun getAllLogs(): LiveData<List<LogEntry>>
-}
 
-//TODO
+    @Query("DELETE FROM log_entries")
+    suspend fun deleteAllLogs()
+}

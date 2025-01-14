@@ -19,8 +19,15 @@ class OpenCloseDoorsViewModel(private val mqttManager: MqttManager, private val 
     private val _isExternalDoorOpen = MutableLiveData<Boolean>(false)
     val isExternalDoorOpen: LiveData<Boolean> get() = _isExternalDoorOpen
 
+    private val _isConnected = MutableLiveData<Boolean>(false) // Estado de conexão MQTT
+    val isConnected: LiveData<Boolean> get() = _isConnected
+
     fun setUserName(name: String) {
         _userName.value = name
+    }
+
+    fun setConnectionStatus(isConnected: Boolean) {
+        _isConnected.value = isConnected
     }
 
     private fun publishDoorState(topic: String, msg: String) {

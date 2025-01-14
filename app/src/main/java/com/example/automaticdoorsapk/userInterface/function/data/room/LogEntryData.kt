@@ -12,4 +12,3 @@ data class LogEntry(
     val methodOfLogin: String, // Método de login (e.g., manual, cartão, app)
     val additionalInfo: String // Informações adicionais sobre a ação
 )
-    //TODO

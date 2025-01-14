@@ -47,6 +47,12 @@ class LogViewModel(application: Application) : AndroidViewModel(application) {
             exampleLogEntries.forEach { logEntry ->
                 logEntryDao.insertLog(logEntry)
             }
+
         }
+    }
+
+    // Função para limpar todos os logs
+    suspend fun clearAllLogs() {
+        logEntryDao.deleteAllLogs() // Deleta todos os logs
     }
 }

@@ -15,9 +15,11 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.automaticdoorsapk.ui.theme.AutomaticDoorsAPKTheme
 import com.example.automaticdoorsapk.userInterface.function.data.room.LogEntry
 import com.example.automaticdoorsapk.userInterface.function.data.room.LogViewModel
+import kotlinx.coroutines.launch
 
 
 class LogActivity : ComponentActivity() {
@@ -29,6 +31,9 @@ class LogActivity : ComponentActivity() {
 
         logViewModel = ViewModelProvider(this)[LogViewModel::class.java]
         //logViewModel.insertExampleLogs()
+        //lifecycleScope.launch {
+        //    logViewModel.clearAllLogs() // Limpa todos os logs
+        //}
         setContent {
             AutomaticDoorsAPKTheme {
                 LogScreen(logViewModel)

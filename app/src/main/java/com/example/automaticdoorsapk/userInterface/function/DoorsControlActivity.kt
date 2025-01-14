@@ -43,10 +43,12 @@ class OpenCloseDoorsActivity : ComponentActivity() {
         mqttManager.connect(
             onConnected = {
                 Log.d("OpenCloseDoorsActivity", "Conexão ao MQTT estabelecida.")
+                viewModel.setConnectionStatus(true)
                 // Habilitar a tela após a conexão
             },
             onError = { throwable ->
                 Log.e("OpenCloseDoorsActivity", "Erro ao conectar ao MQTT: ${throwable.message}")
+                viewModel.setConnectionStatus(false)
                 // Voltar para a MainActivity caso a conexão falhe
                 finish()  // Fechar a Activity atual
             }
@@ -54,9 +56,9 @@ class OpenCloseDoorsActivity : ComponentActivity() {
 
         // Observar o status da conexão MQTT
         mqttManager.connectionStatus.observe(this) { isConnected ->
+            viewModel.setConnectionStatus(isConnected) // Atualizar o status de conexão no ViewModel
             if (!isConnected) {
-                // Conexão perdida, voltar para a Activity anterior
-                finish() // Fecha a atividade atual
+                finish() // Fecha a atividade caso a conexão seja perdida
             }
         }
     }
@@ -75,6 +77,8 @@ fun OpenCloseDoorsScreen(viewModel: OpenCloseDoorsViewModel) {
     val userName by viewModel.userName.observeAsState("")
     val isInternalDoorOpen by viewModel.isInternalDoorOpen.observeAsState(false)
     val isExternalDoorOpen by viewModel.isExternalDoorOpen.observeAsState(false)
+    val isConnected by viewModel.isConnected.observeAsState(false) // Observar o estado de conexão
+
 
     var tempName by remember { mutableStateOf("") }
     var isNameValid by remember { mutableStateOf(false) }
@@ -127,7 +131,8 @@ fun OpenCloseDoorsScreen(viewModel: OpenCloseDoorsViewModel) {
 
             Button(
                 onClick = { viewModel.toggleInternalDoor() },
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp),
+                enabled = isConnected
             ) {
                 Text(text = if (isInternalDoorOpen) "Fechar Porta Interna" else "Abrir Porta Interna")
             }
@@ -139,7 +144,8 @@ fun OpenCloseDoorsScreen(viewModel: OpenCloseDoorsViewModel) {
 
             Button(
                 onClick = { viewModel.toggleExternalDoor() },
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp),
+                enabled = isConnected
             ) {
                 Text(text = if (isExternalDoorOpen) "Fechar Porta Externa" else "Abrir Porta Externa")
             }
