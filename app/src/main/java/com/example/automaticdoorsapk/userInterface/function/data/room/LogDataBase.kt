@@ -5,25 +5,27 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [LogEntry::class], version = 1)
+@Database(entities = [LogEntry::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun logEntryDao(): LogEntryDao
 
     companion object {
         @Volatile
-        private var INSTANCE: AppDatabase? = null
+        private var Instance: AppDatabase? = null
 
         fun getDatabase(context: Context): AppDatabase {
-            return INSTANCE ?: synchronized(this) {
+            return Instance ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
                     "app_database"
                 ).build()
-                INSTANCE = instance
+                Instance = instance
                 instance
             }
         }
     }
 }
+
+//TODO
