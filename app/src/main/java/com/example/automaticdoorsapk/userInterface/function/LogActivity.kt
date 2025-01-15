@@ -19,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.automaticdoorsapk.ui.theme.AutomaticDoorsAPKTheme
 import com.example.automaticdoorsapk.userInterface.function.data.room.LogEntry
 import com.example.automaticdoorsapk.userInterface.function.data.room.LogViewModel
+import com.example.automaticdoorsapk.userInterface.function.data.room.toFormattedDateString
 import kotlinx.coroutines.launch
 
 
@@ -77,12 +78,25 @@ fun LogEntryItem(entry: LogEntry) {
             .background(MaterialTheme.colorScheme.surface, MaterialTheme.shapes.small)
             .padding(16.dp)
     ) {
-        Text(text = "Date: ${entry.date}", style = MaterialTheme.typography.bodyMedium)
-        Text(text = "Login Name: ${entry.loginName}", style = MaterialTheme.typography.bodyMedium)
-        Text(text = "Method of Login: ${entry.methodOfLogin}", style = MaterialTheme.typography.bodyMedium)
-        Text(text = "Additional Info: ${entry.additionalInfo}", style = MaterialTheme.typography.bodyMedium)
+        Text(
+            text = "Date: ${entry.date.toFormattedDateString()}",
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Text(
+            text = "Login Name: ${entry.loginName}",
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Text(
+            text = "Method of Login: ${entry.methodOfLogin}",
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Text(
+            text = "Additional Info: ${entry.additionalInfo}",
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }
+
 
 fun navigateToLogActivity(context: Context) {
     val intent = Intent(context, LogActivity::class.java)
